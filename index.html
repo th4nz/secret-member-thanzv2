@@ -8,7 +8,6 @@
   <title>AM Pro Toolkit | ThanzDev</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -543,55 +542,7 @@
   <div id="toast" class="toast fixed z-50 bottom-5 left-1/2 glass rounded-[12px] px-4 py-3 text-[10px] text-white shadow-2xl max-w-[calc(100vw-32px)]"></div>
 
 <script>
-  const SUPABASE_URL = "https://rjssnlfqtywmmokcxdix.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqc3NubGZxdHl3bW1va2N4ZGl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MTUxODMsImV4cCI6MjEwMjE5MTE4M30.bMqR8JrfRyPG4Xx2gHh1t19dkc6_Qyg-G6XjI3KYfgk";
-
-  let supabaseClient = null;
   let activeInjectEmail = "";
-  let supabaseReady = false;
-
-  window.addEventListener("DOMContentLoaded", async () => {
-    await initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY);
-  });
-
-  async function initSupabase(url, key) {
-    try {
-      for (let i = 0; i < 50 && !window.supabase; i++) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-
-      if (!window.supabase || typeof window.supabase.createClient !== "function") {
-        throw new Error("Library Supabase belum termuat.");
-      }
-
-      if (!url || !key) {
-        throw new Error("SUPABASE_URL atau SUPABASE_ANON_KEY kosong.");
-      }
-
-      supabaseClient = window.supabase.createClient(url, key, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false
-        },
-        global: {
-          headers: {
-            "x-client-info": "am-pro-toolkit"
-          }
-        }
-      });
-
-      supabaseReady = true;
-      console.log("Supabase berhasil diinisialisasi.");
-      return true;
-    } catch (e) {
-      supabaseClient = null;
-      supabaseReady = false;
-      console.error("Supabase init error:", e);
-      showToast("Gagal terhubung ke database.");
-      return false;
-    }
-  }
 
   function showToast(message) {
     const toast = document.getElementById("toast");
@@ -637,6 +588,12 @@
         body: JSON.stringify({ email })
       });
 
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(text || "Terjadi kesalahan pada server.");
+      }
+
       const json = await res.json();
 
       if (!res.ok || json.status === false) {
@@ -648,7 +605,7 @@
       document.getElementById("stepEmailBox").classList.add("hidden");
       document.getElementById("stepVerifyBox").classList.remove("hidden");
       document.getElementById("flowInstruction").textContent =
-        `Magic link terkirim ke folder spam ${email}. Masukkan link verifikasi.`;
+        `Magic link terkirim ke ${email}. Masukkan link verifikasi.`;
 
       showToast("Magic link berhasil dikirim.");
     } catch (err) {
@@ -676,6 +633,12 @@
         })
       });
 
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(text || "Terjadi kesalahan pada server.");
+      }
+
       const json = await res.json();
 
       success = res.ok && json.status !== false;
@@ -693,7 +656,7 @@
       result.classList.remove("hidden");
     } catch (err) {
       success = false;
-      showToast("Kesalahan jaringan.");
+      showToast(err.message || "Kesalahan jaringan.");
     }
 
     if (success) {
@@ -738,6 +701,12 @@
         body: JSON.stringify({ amount })
       });
 
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(text || "Terjadi kesalahan pada server.");
+      }
+
       const json = await res.json();
 
       success = res.ok && json.status !== false;
@@ -753,9 +722,9 @@
       `;
 
       result.classList.remove("hidden");
-    } catch {
+    } catch (err) {
       success = false;
-      showToast("Koneksi gagal.");
+      showToast(err.message || "Koneksi gagal.");
     }
 
     if (success) {
@@ -785,6 +754,12 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(text || "Terjadi kesalahan pada server.");
+      }
 
       const json = await res.json();
 
@@ -863,4 +838,3 @@
 </script>
 </body>
 </html>
-
