@@ -1,25 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-
 const DEFAULT_BASE = "https://api.znn.my.id/alightmotion";
 const DEFAULT_API_ROOT = "https://api.znn.my.id";
-
-// Inisialisasi Supabase Client untuk Backend (Aman menggunakan Service Role / Secret Key)
-let serverSupabase = null;
-export function getServerSupabase() {
-  if (!serverSupabase) {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseSecretKey) {
-      throw new Error("Konfigurasi Supabase URL atau Secret Key belum lengkap di Environment Variables Vercel.");
-    }
-
-    serverSupabase = createClient(supabaseUrl, supabaseSecretKey, {
-      auth: { persistSession: false, autoRefreshToken: false }
-    });
-  }
-  return serverSupabase;
-}
 
 function cleanString(value, max = 4000) {
   return String(value ?? "").trim().slice(0, max);
@@ -80,34 +60,22 @@ export async function callAlightMotion(action, params = {}) {
   const accessToken = cleanString(process.env.ZNN_ACCESS_TOKEN, 4096);
 
   if (!token) {
-    const error = new Error(
-      "AM_TOKEN belum diatur di Environment Variables Vercel."
-    );
+    const error = new Error("AM_TOKEN belum diatur di Environment Variables Vercel.");
     error.statusCode = 500;
     throw error;
   }
 
   if (!accessToken) {
-    const error = new Error(
-      "ZNN_ACCESS_TOKEN belum diatur di Environment Variables Vercel."
-    );
+    const error = new Error("ZNN_ACCESS_TOKEN belum diatur di Environment Variables Vercel.");
     error.statusCode = 500;
     throw error;
   }
 
-  const base = cleanString(
-    process.env.AM_API_BASE || DEFAULT_BASE,
-    1024
-  ).replace(/\/+$/, "");
-
+  const base = cleanString(process.env.AM_API_BASE || DEFAULT_BASE, 1024).replace(/\/+$/, "");
   const url = new URL(base + "/" + action);
 
   for (const [key, value] of Object.entries(params)) {
-    if (
-      value !== undefined &&
-      value !== null &&
-      String(value) !== ""
-    ) {
+    if (value !== undefined && value !== null && String(value) !== "") {
       url.searchParams.set(key, String(value));
     }
   }
@@ -127,9 +95,7 @@ export async function callAlightMotion(action, params = {}) {
       signal: AbortSignal.timeout(28000)
     });
   } catch {
-    const error = new Error(
-      "Tidak dapat terhubung ke layanan Alight Motion."
-    );
+    const error = new Error("Tidak dapat terhubung ke layanan Alight Motion.");
     error.statusCode = 502;
     throw error;
   }
@@ -142,19 +108,14 @@ export async function callAlightMotion(action, params = {}) {
   } catch {
     data = {
       status: false,
-      message:
-        raw.slice(0, 1000) ||
-        "Respons API tidak dapat dibaca."
+      message: raw.slice(0, 1000) || "Respons API tidak dapat dibaca."
     };
   }
 
   const safeData = sanitize(data);
 
   return {
-    ok:
-      response.ok &&
-      safeData &&
-      safeData.status !== false,
+    ok: response.ok && safeData && safeData.status !== false,
     statusCode: response.status,
     data: safeData
   };
@@ -164,18 +125,12 @@ export async function callTempMailRead(email) {
   const accessToken = cleanString(process.env.ZNN_ACCESS_TOKEN, 4096);
 
   if (!accessToken) {
-    const error = new Error(
-      "ZNN_ACCESS_TOKEN belum diatur di Environment Variables Vercel."
-    );
+    const error = new Error("ZNN_ACCESS_TOKEN belum diatur di Environment Variables Vercel.");
     error.statusCode = 500;
     throw error;
   }
 
-  const root = cleanString(
-    process.env.TEMPMAIL_API_BASE || DEFAULT_API_ROOT,
-    1024
-  ).replace(/\/+$/, "");
-
+  const root = cleanString(process.env.TEMPMAIL_API_BASE || DEFAULT_API_ROOT, 1024).replace(/\/+$/, "");
   const url = new URL(root + "/tempmail-read");
   url.searchParams.set("email", email);
 
@@ -193,9 +148,7 @@ export async function callTempMailRead(email) {
       signal: AbortSignal.timeout(28000)
     });
   } catch {
-    const error = new Error(
-      "Tidak dapat terhubung ke layanan Temp Mail."
-    );
+    const error = new Error("Tidak dapat terhubung ke layanan Temp Mail.");
     error.statusCode = 502;
     throw error;
   }
@@ -208,19 +161,14 @@ export async function callTempMailRead(email) {
   } catch {
     data = {
       status: false,
-      message:
-        raw.slice(0, 1000) ||
-        "Respons Temp Mail tidak dapat dibaca."
+      message: raw.slice(0, 1000) || "Respons Temp Mail tidak dapat dibaca."
     };
   }
 
   const safeData = sanitize(data);
 
   return {
-    ok:
-      response.ok &&
-      safeData &&
-      safeData.status !== false,
+    ok: response.ok && safeData && safeData.status !== false,
     statusCode: response.status,
     data: safeData
   };
@@ -228,10 +176,7 @@ export async function callTempMailRead(email) {
 
 export function sendJson(res, statusCode, payload) {
   res.setHeader("Cache-Control", "no-store, max-age=0");
-  res.setHeader(
-    "Content-Type",
-    "application/json; charset=utf-8"
-  );
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
 
   return res.status(statusCode).json(payload);
 }
@@ -239,14 +184,11 @@ export function sendJson(res, statusCode, payload) {
 export function onlyPost(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-
     sendJson(res, 405, {
       status: false,
       message: "Method tidak didukung."
     });
-
     return false;
   }
-
   return true;
 }
