@@ -7,14 +7,17 @@ export default async function handler(req, res) {
     const API_KEY = process.env.API_KEY;
 
     if (!API_BASE || !API_KEY) {
-        return res.status(500).json({ status: false, error: 'Environment variables not set' });
+        return res.status(500).json({ status: false, error: 'Environment variables not set on Vercel' });
     }
 
     try {
+        // 1. Get available domains from mail.tm
         const domainRes = await fetch('https://api.mail.tm/domains');
+        if (!domainRes.ok) throw new Error('Gagal terhubung ke layanan mail.tm (Domains)');
         const domainData = await domainRes.json();
+        
         if (!domainData['hydra:member'] || domainData['hydra:member'].length === 0) {
-            throw new Error('Gagal mengambil domain mail.tm');
+            throw new Error('Domain mail.tm sedang kosong');
         }
         const domain = domainData['hydra:member'][0].domain;
 
@@ -22,19 +25,93 @@ export default async function handler(req, res) {
         const email = `am_${randomStr}@${domain}`;
         const password = `Pass_${Math.random().toString(36).substring(2, 12)}!`;
 
+        // 2. Create account
         const createRes = await fetch('https://api.mail.tm/accounts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ address: email, password: password })
         });
-        if (!createRes.ok) throw new Error('Gagal membuat akun email temporer');
+        if (!createRes.ok) {
+            const errTxt = await createRes.text();
+            throw new Error(`Gagal membuat akun email: ${errTxt}`);
+        }
 
+        // 3. Get token
         const tokenRes = await fetch('https://api.mail.tm/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ address: email, password: password })
         });
+        if (!tokenRes.ok) throw new Error('Gagal mendapatkan token email mail.tm');
+        
         const tokenData = await tokenRes.json();
+        const token = tokenData.token;
+        if (!token) throw new Error('Token email kosong');
+
+        // 4. Send magic link to AM API
+        const targetSendUrl = `${API_BASE}/api/am?action=send&apikey=${API_KEY}&email=${encodeURIComponent(email)}`;
+        const sendResponse = await fetch(targetSendUrl);
+        const sendResult = await sendResponse.json();
+        if (!sendResult.status) {
+            throw new Error(sendResult.error || 'Gagal mengirim magic link AM dari server API');
+        }
+
+        // 5. Poll messages (max 8 attempts, 3 seconds interval)
+        let magicLink = null;
+        for (let i = 0; i < 8; i++) {
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            const msgRes = await fetch('https://api.mail.tm/messages', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!msgRes.ok) continue;
+            
+            const msgData = await msgRes.json();
+            const messages = msgData['hydra:member'];
+
+            if (messages && messages.length > 0) {
+                const messageId = messages[0].id;
+                const detailRes = await fetch(`https://api.mail.tm/messages/${messageId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!detailRes.ok) continue;
+                
+                const detailData = await detailRes.json();
+                const textContent = detailData.html || detailData.text || '';
+                
+                // Cari URL magic link di dalam isi pesan email
+                const urlMatch = textContent.match(/https?:\/\/[^\s"'<>]+?(?:verify|auth|login|am)[^\s"'<>]*?/i) || textContent.match(/https?:\/\/[^\s"'<>]+/);
+                
+                if (urlMatch) {
+                    magicLink = urlMatch[0].replace(/["'>]/g, '');
+                    break;
+                }
+            }
+        }
+
+        if (!magicLink) {
+            throw new Error('Timeout: Email masuk dari Alight Motion tidak ditemukan dalam waktu 24 detik.');
+        }
+
+        // 6. Verify magic link automatically
+        const targetVerifUrl = `${API_BASE}/api/am?action=verif&apikey=${API_KEY}&email=${encodeURIComponent(email)}&url=${encodeURIComponent(magicLink)}`;
+        const verifResponse = await fetch(targetVerifUrl);
+        const verifResult = await verifResponse.json();
+
+        if (verifResult.status) {
+            return res.status(200).json({
+                status: true,
+                message: 'Akun berhasil dibuat dan berhasil di-inject otomatis!',
+                email: email
+            });
+        } else {
+            throw new Error(verifResult.error || 'Gagal verifikasi magic link Alight Motion');
+        }
+
+    } catch (error) {
+        return res.status(500).json({ status: false, error: error.message });
+    }
+}        const tokenData = await tokenRes.json();
         const token = tokenData.token;
         if (!token) throw new Error('Gagal mendapatkan token email');
 
