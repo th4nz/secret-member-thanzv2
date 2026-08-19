@@ -64,13 +64,11 @@ function getApiKey(paramKey) {
   const validParamKey = validateApiKey(paramKey);
   if (validParamKey) return validParamKey;
 
-  // Mengambil dari THANZ_API_KEY (atau fallback ke API_KEY umum)
   const envKey = cleanString(process.env.THANZ_API_KEY || process.env.API_KEY, 64);
   return envKey;
 }
 
 async function callIsaawApi(endpoint, params = {}) {
-  // Mengambil dari THANZ_API_BASE (atau fallback ke BASE_URL umum)
   const base = cleanString(
     process.env.THANZ_API_BASE || process.env.BASE_URL,
     1024
@@ -106,7 +104,7 @@ async function callIsaawApi(endpoint, params = {}) {
       headers: {
         accept: "application/json",
         "X-API-Key": apiKey,
-        "user-agent": "thanz-am-client/1.0"
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
       },
       redirect: "follow",
       signal: AbortSignal.timeout(28000)
@@ -118,6 +116,19 @@ async function callIsaawApi(endpoint, params = {}) {
   }
 
   const raw = await response.text();
+
+  // Deteksi jika server mengembalikan halaman HTML (seperti Security Checkpoint Vercel)
+  if (raw.trim().toLowerCase().startsWith("<!doctype html") || raw.includes("<html")) {
+    return {
+      ok: false,
+      statusCode: 502,
+      data: {
+        status: false,
+        message: "Server API utama sedang memblokir permintaan (Security Checkpoint). Silakan coba beberapa saat lagi."
+      }
+    };
+  }
+
   let data;
 
   try {
@@ -125,7 +136,7 @@ async function callIsaawApi(endpoint, params = {}) {
   } catch {
     data = {
       status: false,
-      message: raw.slice(0, 1000) || "Respons API tidak dapat dibaca."
+      message: "Respons API tidak dapat dibaca."
     };
   }
 
