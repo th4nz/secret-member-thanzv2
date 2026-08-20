@@ -1,11 +1,12 @@
 export default async function handler(req, res) {
-    if (req.method !== 'GET') {
+    // Mengizinkan GET dan POST agar aman dari error Method Not Allowed
+    if (req.method !== 'GET' && req.method !== 'POST') {
         return res.status(405).json({ status: false, error: 'Method Not Allowed' });
     }
 
-    const { email, apikey } = req.query;
-    
-    // Mengambil dari Vercel Environment Variables jika apikey tidak dikirim dari query
+    const email = req.query.email || (req.body && req.body.email);
+    const apikey = req.query.apikey || (req.body && req.body.apikey);
+
     const API_BASE = process.env.API_BASE;
     const API_KEY = apikey || process.env.API_KEY;
 
@@ -20,7 +21,15 @@ export default async function handler(req, res) {
     try {
         const targetUrl = `${API_BASE}/api/am/sendlink?apikey=${encodeURIComponent(API_KEY)}&email=${encodeURIComponent(email)}`;
         const response = await fetch(targetUrl);
-        const data = await response.json();
+        const text = await response.text();
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (err) {
+            return res.status(500).json({ status: false, error: 'API utama mengembalikan respons non-JSON: ' + text.substring(0, 100) });
+        }
+
         return res.status(200).json(data);
     } catch (error) {
         return res.status(500).json({ status: false, error: error.message });
