@@ -12,11 +12,16 @@ export default async function handler(req, res) {
     }
 
     if (!API_BASE || !API_KEY) {
-        return res.status(500).json({ status: false, error: 'Server environment variables not configured' });
+        return res.status(500).json({ 
+            status: false, 
+            error: 'Environment variables API_BASE atau API_KEY belum di-setting di Vercel!' 
+        });
     }
 
     try {
-        const targetUrl = `${API_BASE}/api/am/sendlink?apikey=${encodeURIComponent(API_KEY)}&email=${encodeURIComponent(email)}`;
+        const cleanBase = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+        const targetUrl = `${cleanBase}/api/am/sendlink?apikey=${encodeURIComponent(API_KEY)}&email=${encodeURIComponent(email)}`;
+        
         const response = await fetch(targetUrl);
         const text = await response.text();
         
@@ -24,7 +29,10 @@ export default async function handler(req, res) {
         try {
             data = JSON.parse(text);
         } catch (err) {
-            return res.status(500).json({ status: false, error: 'API Utama mengembalikan non-JSON: ' + text.substring(0, 80) });
+            return res.status(500).json({ 
+                status: false, 
+                error: `API Utama (${cleanBase}) mengembalikan non-JSON. Cek apakah API_BASE benar.` 
+            });
         }
 
         return res.status(200).json(data);
