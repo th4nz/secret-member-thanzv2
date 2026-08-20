@@ -1,598 +1,702 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#030712" />
-  <title>ThanzAM | Liquid Glass Edition</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThanzDev — Liquid Glass Premium</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  :root{
+    --void:#020308;
+    --deep:#060a14;
+    --blue:#2fb8ff;
+    --blue-hi:#8fe0ff;
+    --blue-dim:#0d7ab8;
+    --text-hi:#f2f7fb;
+    --text-lo:#7c8ba0;
+    --hairline:rgba(140,200,255,0.09);
+  }
 
-  <style>
-    :root {
-      --bg: #030712;
-      --panel: rgba(8, 15, 30, 0.65);
-      --line: rgba(56, 189, 248, 0.28);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --neon-bright: #38bdf8;
-    }
+  *{box-sizing:border-box;margin:0;padding:0;}
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { scroll-behavior: smooth; background: var(--bg); }
-    body {
-      margin: 0; min-height: 100vh; overflow-x: hidden; color: var(--text);
-      background: radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.22), transparent 40%),
-                  radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.15), transparent 45%), var(--bg);
-      font-family: Inter, sans-serif;
-    }
+  html{scroll-behavior:smooth;}
 
-    /* Liquid Ambient Floating Orbs */
-    .liquid-orb {
-      position: fixed; width: 420px; height: 420px; border-radius: 50%;
-      pointer-events: none; z-index: -1; filter: blur(90px); opacity: 0.6;
-      animation: floatOrbs 10s ease-in-out infinite alternate;
-    }
-    .liquid-orb.one { left: -150px; top: -50px; background: rgba(6, 182, 212, 0.35); }
-    .liquid-orb.two { right: -150px; bottom: -50px; background: rgba(56, 189, 248, 0.28); animation-delay: -5s; }
+  body{
+    min-height:100vh;
+    background:var(--void);
+    font-family:'Manrope',system-ui,sans-serif;
+    color:var(--text-hi);
+    position:relative;
+    overflow-x:hidden;
+  }
 
-    @keyframes floatOrbs {
-      0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(30px) scale(1.1); }
-    }
+  /* =========================
+     AMBIENT LIQUID FIELD
+     ========================= */
 
-    /* Enhanced Liquid Glassmorphism Styling */
-    .liquid-glass {
-      background: var(--panel);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border: 1px solid var(--line);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 
-                  0 0 30px rgba(6, 182, 212, 0.15), 
-                  inset 0 1px 1px rgba(255, 255, 255, 0.15),
-                  inset 0 -1px 1px rgba(0, 0, 0, 0.4);
-    }
+  .field{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+  }
 
-    .brand-mark {
-      background: linear-gradient(145deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.1));
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
-    }
+  .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(90px);
+    opacity:0.35;
+    mix-blend-mode:screen;
+  }
 
-    .status-dot {
-      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12), 0 0 15px rgba(52, 211, 153, 0.6);
-    }
+  .blob.a{
+    width:60vw;
+    height:60vw;
+    max-width:520px;
+    max-height:520px;
+    top:-18%;
+    left:-20%;
+    background:radial-gradient(
+      circle,
+      var(--blue) 0%,
+      transparent 70%
+    );
+    animation:drift1 26s ease-in-out infinite;
+  }
 
-    input {
-      width: 100%; color: #f8fafc !important;
-      background: rgba(3, 8, 18, 0.75) !important;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(56, 189, 248, 0.25) !important;
-      border-radius: 14px !important; outline: none; transition: .25s ease;
-    }
-    input::placeholder { color: #64748b; }
-    input:hover { border-color: rgba(56, 189, 248, 0.5) !important; }
-    input:focus {
-      border-color: var(--neon-bright) !important;
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3), 0 0 25px rgba(6, 182, 212, 0.5) !important;
-      background: rgba(5, 12, 25, 0.9) !important;
-    }
+  .blob.b{
+    width:50vw;
+    height:50vw;
+    max-width:460px;
+    max-height:460px;
+    bottom:-10%;
+    right:-16%;
+    background:radial-gradient(
+      circle,
+      #1a6fbf 0%,
+      transparent 70%
+    );
+    animation:drift2 32s ease-in-out infinite;
+  }
 
-    .btn {
-      border-radius: 14px;
-      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
-      position: relative; cursor: pointer;
-    }
-    .btn:active { transform: scale(0.97); }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #06b6d4, #0284c7);
-      border: 1px solid rgba(125, 211, 252, 0.5);
-      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45), 0 0 30px rgba(6, 182, 212, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.35);
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #38bdf8, #0369a1);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 28px rgba(6, 182, 212, 0.65), 0 0 40px rgba(56, 189, 248, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-    }
+  .blob.c{
+    width:34vw;
+    height:34vw;
+    max-width:300px;
+    max-height:300px;
+    top:38%;
+    left:58%;
+    background:radial-gradient(
+      circle,
+      var(--blue-hi) 0%,
+      transparent 70%
+    );
+    opacity:0.16;
+    animation:drift3 22s ease-in-out infinite;
+  }
 
-    .btn-ghost {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      color: #bae6fd;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.08);
-    }
-    .btn-ghost:hover {
-      color: white; background: rgba(6, 182, 212, 0.18);
-      border-color: rgba(56, 189, 248, 0.45);
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
-    }
+  @keyframes drift1{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(6%,8%) scale(1.08);}
+  }
 
-    .section-label {
-      color: #38bdf8; font-size: 9px; font-weight: 700;
-      letter-spacing: .14em; text-transform: uppercase;
-      text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
-    }
+  @keyframes drift2{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(-5%,-6%) scale(1.05);}
+  }
 
-    .result-box {
-      background: rgba(4, 9, 20, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.1);
-    }
+  @keyframes drift3{
+    0%,100%{transform:translate(0,0);}
+    50%{transform:translate(-10%,10%);}
+  }
 
-    .toast {
-      transform: translate(-50%, 14px); opacity: 0.1; pointer-events: none; transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-      background: rgba(8, 15, 30, 0.95); border: 1px solid rgba(56, 189, 248, 0.4);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 25px rgba(6, 182, 212, 0.35);
-      backdrop-filter: blur(20px);
-    }
-    .toast.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-    .hidden { display: none !important; }
-  </style>
+  .noise{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    opacity:0.025;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* =========================
+     CENTER WRAPPER
+     ========================= */
+
+  .wrap{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:460px;
+    min-height:100vh;
+    margin:0 auto;
+    padding:30px 20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+
+  /* =========================
+     HEADER
+     ========================= */
+
+  header{
+    margin-bottom:30px;
+  }
+
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:2.5px;
+    color:var(--blue);
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+
+  .eyebrow::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--blue);
+    box-shadow:0 0 8px 2px var(--blue);
+  }
+
+  h1{
+    font-size:30px;
+    font-weight:800;
+    letter-spacing:-1.1px;
+    line-height:1.08;
+    color:#fff;
+  }
+
+  h1 span{
+    background:linear-gradient(100deg, var(--blue-hi), var(--blue) 55%, var(--blue-dim));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  header p{
+    margin-top:10px;
+    font-size:13.5px;
+    color:var(--text-lo);
+    line-height:1.6;
+    max-width:34ch;
+  }
+
+  /* =========================
+     LIQUID GLASS CONTAINER
+     ========================= */
+
+  .glass{
+    position:relative;
+    background:linear-gradient(155deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015) 45%, rgba(120,190,255,0.02));
+    border-radius:26px;
+    backdrop-filter:blur(24px) saturate(140%);
+    -webkit-backdrop-filter:blur(24px) saturate(140%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.18) inset,
+      0 -1px 0 rgba(0,0,0,0.4) inset,
+      0 24px 60px -20px rgba(0,0,0,0.75),
+      0 0 0 1px rgba(255,255,255,0.06);
+    padding:26px 24px;
+    margin-bottom:20px;
+  }
+
+  .glass::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    padding:1px;
+    background:conic-gradient(from 220deg at 30% 20%, rgba(255,255,255,0.55), rgba(255,255,255,0.02) 25%, rgba(47,184,255,0.35) 50%, rgba(255,255,255,0.02) 75%, rgba(255,255,255,0.4));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    pointer-events:none;
+    opacity:0.9;
+  }
+
+  .glass::after{
+    content:"";
+    position:absolute;
+    top:-20%;
+    left:-10%;
+    width:60%;
+    height:55%;
+    background:radial-gradient(ellipse, rgba(255,255,255,0.16), transparent 70%);
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(2px);
+  }
+
+  /* =========================
+     FORM ELEMENTS
+     ========================= */
+
+  .form-group {
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .form-group label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--blue-hi);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .input-clay {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 14px;
+    background: rgba(2, 3, 8, 0.4);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    color: var(--text-hi);
+    outline: none;
+    transition: all 0.25s ease;
+    font-family: 'Manrope', inherit;
+  }
+
+  .input-clay::placeholder {
+    color: var(--text-lo);
+    opacity: 0.6;
+  }
+
+  .input-clay:focus {
+    border-color: rgba(47, 184, 255, 0.5);
+    box-shadow: 0 0 15px rgba(47, 184, 255, 0.15);
+  }
+
+  .email-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .email-row .input-clay {
+    flex: 1;
+  }
+
+  /* =========================
+     BUTTONS
+     ========================= */
+
+  .btn-clay {
+    font-family: 'Manrope', inherit;
+    cursor: pointer;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 14px 20px;
+    border-radius: 14px;
+    background: rgba(47, 184, 255, 0.15);
+    color: var(--blue-hi);
+    border: 1px solid rgba(47, 184, 255, 0.3);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .btn-clay:hover:not(:disabled) {
+    background: rgba(47, 184, 255, 0.25);
+    box-shadow: 0 0 15px rgba(47, 184, 255, 0.3);
+  }
+
+  .btn-clay:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .btn-activation {
+    width: 100%;
+    font-family: 'Manrope', inherit;
+    cursor: pointer;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 16px 22px;
+    border-radius: 16px;
+    color: #00131f;
+    background: linear-gradient(135deg, var(--blue-hi), var(--blue) 70%);
+    box-shadow: 0 8px 24px -6px rgba(47,184,255,0.55), inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: all 0.2s cubic-bezier(.2,.8,.3,1);
+    position: relative;
+    overflow: hidden;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    z-index: 2;
+  }
+
+  .btn-activation:hover:not(:disabled) {
+    box-shadow: 0 10px 30px -6px rgba(47,184,255,0.75), inset 0 1px 0 rgba(255,255,255,0.7);
+    transform: translateY(-1px);
+  }
+
+  .btn-activation:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .btn-activation:disabled {
+    cursor: default;
+    opacity: 0.9;
+  }
+
+  /* =========================
+     LOADER & SUCCESS
+     ========================= */
+
+  .loader-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .loader-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #00131f;
+    animation: bounceDot 1.4s ease-in-out infinite both;
+  }
+
+  .loader-dot.d2 { animation-delay: -0.16s; }
+  .loader-dot.d3 { animation-delay: -0.32s; }
+
+  @keyframes bounceDot {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+  }
+
+  .success-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .success-content svg {
+    width: 20px;
+    height: 20px;
+    stroke: #00131f;
+    fill: none;
+    stroke-width: 3;
+  }
+
+  /* =========================
+     ERROR MESSAGE
+     ========================= */
+
+  .error-msg {
+    background: rgba(255, 60, 60, 0.1);
+    border: 1px solid rgba(255, 60, 60, 0.3);
+    color: #ff9e9e;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .error-msg.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* =========================
+     FOOTER
+     ========================= */
+
+  footer{
+    text-align:center;
+    margin-top:24px;
+  }
+
+  footer .line{
+    width:36px;
+    height:1px;
+    background:var(--hairline);
+    margin:0 auto 14px;
+  }
+
+  footer p{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--text-lo);
+    text-transform:uppercase;
+  }
+
+  footer b{
+    color:var(--blue-hi);
+  }
+
+  .hidden { display: none !important; }
+</style>
 </head>
 
-<body class="min-h-screen px-3 py-3 sm:px-5 sm:py-5">
-  <div class="liquid-orb one"></div>
-  <div class="liquid-orb two"></div>
+<body>
 
-  <div class="w-full max-w-2xl mx-auto flex min-h-[calc(100vh-24px)] sm:min-h-[calc(100vh-40px)] flex-col">
+<div class="field">
+  <div class="blob a"></div>
+  <div class="blob b"></div>
+  <div class="blob c"></div>
+</div>
 
-    <!-- TOPBAR -->
-    <header class="liquid-glass rounded-[20px] px-4 py-3.5 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="brand-mark w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-wand-magic-sparkles text-cyan-300 text-sm drop-shadow-[0_0_10px_rgba(56,189,248,0.9)]"></i>
+<div class="noise"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">
+      ThanzDev System
+    </div>
+    <h1>
+      Generate Acc<br>
+      <span>AM Premium</span>
+    </h1>
+    <p>
+      Sistem aktivasi akun Alight Motion premium otomatis dengan antarmuka liquid glass berkecepatan tinggi.
+    </p>
+  </header>
+
+  <div class="glass">
+    <!-- Email -->
+    <div class="form-group">
+        <label for="emailInput">Email Akun</label>
+        <div class="email-row">
+            <input type="email" id="emailInput" class="input-clay" placeholder="Masukkan email..." autocomplete="email" />
+            <button id="sendBtn" class="btn-clay">Send</button>
         </div>
-        <div class="min-w-0">
-          <div class="font-display font-bold text-[14px] text-white tracking-tight truncate drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]">ThanzAM</div>
-          <div class="text-[9px] text-[#38bdf8] mt-0.5 tracking-wide">Alight Motion Toolkit</div>
-        </div>
-      </div>
+    </div>
 
-      <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[.04] border border-white/[.08] text-[9px] text-[#7dd3fc]">
-          <span class="status-dot w-2 h-2 rounded-full bg-emerald-400"></span>
-          ONLINE
-        </div>
-      </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col justify-center py-5">
-      <div class="w-full max-w-md mx-auto">
-        <div class="liquid-glass rounded-[20px] overflow-hidden p-5">
-
-          <div class="mb-5">
-            <div class="section-label mb-1.5">Alight Motion V1</div>
-            <h2 class="font-display font-bold text-[15px] text-white">Generator Akun Pro</h2>
-            <p id="flowInstruction" class="text-[10px] text-[#94a3b8] mt-1.5 leading-relaxed">
-              Isi email aktif, kirim magic link, lalu verifikasi untuk mendapatkan akun Pro.
-            </p>
-          </div>
-
-          <!-- STEP 1: EMAIL (API: /api/am/sendlink) -->
-          <div id="stepEmailBox" class="space-y-3.5">
-            <div>
-              <label class="block text-[10px] font-medium text-[#bae6fd] mb-1.5">Email Alight Motion</label>
-              <input id="inputEmail" type="email" placeholder="thanz@gmail.com" class="px-3.5 py-3.5 text-[11px]" />
-            </div>
-            <button onclick="handleSendMagicLink()" class="btn btn-primary w-full py-3.5 text-[11px] font-bold text-white">
-              <i class="fa-solid fa-paper-plane mr-1.5"></i> Kirim Magic Link (/api/am/sendlink)
-            </button>
-          </div>
-
-          <!-- STEP 2: VERIFY LINK (API: /api/amp/reqprem) -->
-          <div id="stepVerifyBox" class="hidden space-y-3.5">
-            <div>
-              <label class="block text-[10px] font-medium text-[#bae6fd] mb-1.5">Tautan / Magic Link</label>
-              <input id="inputLink" type="url" placeholder="https://alightcreative.com/..." class="px-3.5 py-3.5 text-[11px]" />
-            </div>
-            <div class="grid grid-cols-[1fr_auto] gap-2">
-              <button onclick="handleVerifyLink()" class="btn btn-primary py-3.5 text-[11px] font-bold text-white">
-                Verifikasi Link (/api/amp/reqprem)
-              </button>
-              <button onclick="resetAmFlow()" class="btn btn-ghost px-3.5 text-[#bae6fd]">
-                <i class="fa-solid fa-rotate-left"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- STEP 3: SUCCESS RESULT -->
-          <div id="stepSuccessBox" class="hidden space-y-3.5 text-center py-2">
-            <div class="w-14 h-14 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-xl mb-2 shadow-[0_0_20px_rgba(52,211,153,0.35)]">
-              <i class="fa-solid fa-check"></i>
-            </div>
-            <h3 class="font-bold text-white text-[14px]">Akun Pro Berhasil Diaktifkan!</h3>
-            <div class="result-box p-3.5 rounded-[14px] text-left">
-              <div class="text-[9px] text-[#94a3b8]">Detail Respons Server</div>
-              <pre id="jsonResult" class="font-mono text-[10px] text-cyan-300 mt-1.5 overflow-x-auto whitespace-pre-wrap"></pre>
-            </div>
-            <button onclick="resetAmFlow()" class="btn btn-ghost w-full py-3 text-[10px]">Buat Lagi</button>
-          </div>
-
-        </div>
-      </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="text-center pb-2 pt-1">
-      <div class="text-[9px] text-[#64748b]">
-        ThanzAM <span class="mx-1 text-[#38bdf8]/55">•</span> All systems ONLINE <span class="mx-1 text-[#38bdf8]/55">•</span> 2026
-      </div>
-    </footer>
+    <!-- Magic Link -->
+    <div class="form-group" style="margin-bottom: 0;">
+        <label for="magicInput">Magic Link</label>
+        <input type="url" id="magicInput" class="input-clay" placeholder="Tempel magic link disini..." autocomplete="off" />
+    </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="toast fixed z-50 bottom-5 left-1/2 liquid-glass rounded-[14px] px-4 py-3 text-[10px] text-white shadow-2xl max-w-[calc(100vw-32px)]"></div>
+  <!-- Error message -->
+  <div id="errorMsg" class="error-msg" role="alert"></div>
 
-  <!-- SCRIPT LOGIKA API LANGSUNG -->
-  <script>
-    const GLOBAL_API_KEY = "ISAAW-PRW70Z4Z";
-    let savedEmail = "";
-
-    // Modul Endpoint 1: sendlink
-    async function sendLinkApi(email) {
-      if (!email) throw new Error("Email tujuan wajib diisi!");
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            status: true,
-            code: 200,
-            message: "Verification link sent successfully to email!",
-            apiKeyUsed: GLOBAL_API_KEY,
-            targetEmail: email
-          });
-        }, 500);
-      });
-    }
-
-    // Modul Endpoint 2: reqprem
-    async function verifyReqPrem(email, link) {
-      if (!email || !link) throw new Error("Email akun dan link verifikasi wajib diisi!");
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            status: true,
-            code: 200,
-            message: "Alight Motion Premium successfully verified & activated!",
-            apiKeyUsed: GLOBAL_API_KEY,
-            emailAccount: email,
-            verificationLink: link,
-            tier: "Pro Unlimited",
-            activationDate: new Date().toISOString()
-          });
-        }, 500);
-      });
-    }
-
-    window.showToast = function(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-
-    window.handleSendMagicLink = async function() {
-      const email = document.getElementById('inputEmail').value.trim();
-      if (!email || !email.includes('@')) {
-        showToast("⚠️ Masukkan email yang valid!");
-        return;
-      }
-      
-      savedEmail = email;
-      showToast("⏳ Mengirim magic link...");
-
-      try {
-        const res = await sendLinkApi(email);
-        showToast("✅ " + res.message);
-        document.getElementById('stepEmailBox').classList.add('hidden');
-        document.getElementById('stepVerifyBox').classList.remove('hidden');
-        document.getElementById('flowInstruction').innerText = `Magic link terkirim ke ${email}. Masukkan link verifikasi di bawah.`;
-      } catch (err) {
-        showToast("❌ " + err.message);
-      }
-    };
-
-    window.handleVerifyLink = async function() {
-      const link = document.getElementById('inputLink').value.trim();
-      if (!link) {
-        showToast("⚠️ Masukkan tautan verifikasi!");
-        return;
-      }
-
-      showToast("⏳ Memproses verifikasi akun...");
-
-      try {
-        const res = await verifyReqPrem(savedEmail, link);
-        showToast("🎉 Berhasil diverifikasi!");
-        document.getElementById('stepVerifyBox').classList.add('hidden');
-        document.getElementById('stepSuccessBox').classList.remove('hidden');
-        document.getElementById('jsonResult').innerText = JSON.stringify(res, null, 2);
-        document.getElementById('flowInstruction').innerText = "Akun Alight Motion Pro berhasil diaktifkan.";
-      } catch (err) {
-        showToast("❌ " + err.message);
-      }
-    };
-
-    window.resetAmFlow = function() {
-      document.getElementById('inputEmail').value = "";
-      document.getElementById('inputLink').value = "";
-      document.getElementById('stepSuccessBox').classList.add('hidden');
-      document.getElementById('stepVerifyBox').classList.add('hidden');
-      document.getElementById('stepEmailBox').classList.remove('hidden');
-      document.getElementById('flowInstruction').innerText = "Isi email aktif, kirim magic link, lalu verifikasi untuk mendapatkan akun Pro.";
-    };
-  </script>
-</body>
-</html>
-```    .liquid-orb {
-      position: fixed; width: 420px; height: 420px; border-radius: 50%;
-      pointer-events: none; z-index: -1; filter: blur(90px); opacity: 0.6;
-      animation: floatOrbs 10s ease-in-out infinite alternate;
-    }
-    .liquid-orb.one { left: -150px; top: -50px; background: rgba(6, 182, 212, 0.35); }
-    .liquid-orb.two { right: -150px; bottom: -50px; background: rgba(56, 189, 248, 0.28); animation-delay: -5s; }
-
-    @keyframes floatOrbs {
-      0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(30px) scale(1.1); }
-    }
-
-    /* Enhanced Liquid Glassmorphism Styling */
-    .liquid-glass {
-      background: var(--panel);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border: 1px solid var(--line);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 
-                  0 0 30px rgba(6, 182, 212, 0.15), 
-                  inset 0 1px 1px rgba(255, 255, 255, 0.15),
-                  inset 0 -1px 1px rgba(0, 0, 0, 0.4);
-    }
-
-    .brand-mark {
-      background: linear-gradient(145deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.1));
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      box-shadow: 0 0 25px rgba(6, 182, 212, 0.4);
-    }
-
-    .status-dot {
-      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12), 0 0 15px rgba(52, 211, 153, 0.6);
-    }
-
-    input {
-      width: 100%; color: #f8fafc !important;
-      background: rgba(3, 8, 18, 0.75) !important;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(56, 189, 248, 0.25) !important;
-      border-radius: 14px !important; outline: none; transition: .25s ease;
-    }
-    input::placeholder { color: #64748b; }
-    input:hover { border-color: rgba(56, 189, 248, 0.5) !important; }
-    input:focus {
-      border-color: var(--neon-bright) !important;
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3), 0 0 25px rgba(6, 182, 212, 0.5) !important;
-      background: rgba(5, 12, 25, 0.9) !important;
-    }
-
-    .btn {
-      border-radius: 14px;
-      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
-      position: relative; cursor: pointer;
-    }
-    .btn:active { transform: scale(0.97); }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #06b6d4, #0284c7);
-      border: 1px solid rgba(125, 211, 252, 0.5);
-      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45), 0 0 30px rgba(6, 182, 212, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.35);
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #38bdf8, #0369a1);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 28px rgba(6, 182, 212, 0.65), 0 0 40px rgba(56, 189, 248, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-    }
-
-    .btn-ghost {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      color: #bae6fd;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 12px rgba(6, 182, 212, 0.08);
-    }
-    .btn-ghost:hover {
-      color: white; background: rgba(6, 182, 212, 0.18);
-      border-color: rgba(56, 189, 248, 0.45);
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
-    }
-
-    .section-label {
-      color: #38bdf8; font-size: 9px; font-weight: 700;
-      letter-spacing: .14em; text-transform: uppercase;
-      text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
-    }
-
-    .result-box {
-      background: rgba(4, 9, 20, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      box-shadow: inset 0 0 20px rgba(6, 182, 212, 0.1);
-    }
-
-    .toast {
-      transform: translate(-50%, 14px); opacity: 0; pointer-events: none; transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-      background: rgba(8, 15, 30, 0.92); border: 1px solid rgba(56, 189, 248, 0.4);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.7), 0 0 25px rgba(6, 182, 212, 0.35);
-      backdrop-filter: blur(20px);
-    }
-    .toast.show { transform: translate(-50%, 0); opacity: 1; }
-    .hidden { display: none !important; }
-  </style>
-</head>
-
-<body class="min-h-screen px-3 py-3 sm:px-5 sm:py-5">
-  <div class="liquid-orb one"></div>
-  <div class="liquid-orb two"></div>
-
-  <div class="w-full max-w-2xl mx-auto flex min-h-[calc(100vh-24px)] sm:min-h-[calc(100vh-40px)] flex-col">
-
-    <!-- TOPBAR -->
-    <header class="liquid-glass rounded-[20px] px-4 py-3.5 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="brand-mark w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-wand-magic-sparkles text-cyan-300 text-sm drop-shadow-[0_0_10px_rgba(56,189,248,0.9)]"></i>
-        </div>
-        <div class="min-w-0">
-          <div class="font-display font-bold text-[14px] text-white tracking-tight truncate drop-shadow-[0_0_12px_rgba(56,189,248,0.4)]">ThanzAM</div>
-          <div class="text-[9px] text-[#38bdf8] mt-0.5 tracking-wide">Alight Motion Toolkit</div>
-        </div>
+  <!-- Activation Button -->
+  <button id="activateBtn" class="btn-activation" aria-label="Aktivasi">
+      <span id="btnDefault">Aktivasi Sekarang</span>
+      <div id="loaderContainer" class="loader-container hidden">
+          <span class="loader-dot d1"></span>
+          <span class="loader-dot d2"></span>
+          <span class="loader-dot d3"></span>
       </div>
+      <span id="btnSuccess" class="hidden success-content">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+          <span>Berhasil Diaktivasi</span>
+      </span>
+  </button>
 
-      <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[.04] border border-white/[.08] text-[9px] text-[#7dd3fc]">
-          <span class="status-dot w-2 h-2 rounded-full bg-emerald-400"></span>
-          ONLINE
-        </div>
-      </div>
-    </header>
+  <footer>
+    <div class="line"></div>
+    <p>
+      ThanzDev · <b>#2FB8FF</b> Liquid System
+    </p>
+  </footer>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col justify-center py-5">
-      <div class="w-full max-w-md mx-auto">
-        <div class="liquid-glass rounded-[20px] overflow-hidden p-5">
+</div>
 
-          <div class="mb-5">
-            <div class="section-label mb-1.5">Alight Motion V1</div>
-            <h2 class="font-display font-bold text-[15px] text-white">Generator Akun Pro</h2>
-            <p id="flowInstruction" class="text-[10px] text-[#94a3b8] mt-1.5 leading-relaxed">
-              Isi email aktif, kirim magic link, lalu verifikasi untuk mendapatkan akun Pro.
-            </p>
-          </div>
+<script>
+    (function() {
+        'use strict';
 
-          <!-- STEP 1: EMAIL (API: /api/am/sendlink) -->
-          <div id="stepEmailBox" class="space-y-3.5">
-            <div>
-              <label class="block text-[10px] font-medium text-[#bae6fd] mb-1.5">Email Alight Motion</label>
-              <input id="inputEmail" type="email" placeholder="thanz@gmail.com" class="px-3.5 py-3.5 text-[11px]" />
-            </div>
-            <button onclick="handleSendMagicLink()" class="btn btn-primary w-full py-3.5 text-[11px] font-bold text-white">
-              <i class="fa-solid fa-paper-plane mr-1.5"></i> Kirim Magic Link (/api/am/sendlink)
-            </button>
-          </div>
+        // ========== KONFIGURASI API ==========
+        const API_BASE = 'https://restapidhan.vercel.app';
+        const API_KEY = 'dravndesamuel';
 
-          <!-- STEP 2: VERIFY LINK (API: /api/amp/reqprem) -->
-          <div id="stepVerifyBox" class="hidden space-y-3.5">
-            <div>
-              <label class="block text-[10px] font-medium text-[#bae6fd] mb-1.5">Tautan / Magic Link</label>
-              <input id="inputLink" type="url" placeholder="https://alightcreative.com/..." class="px-3.5 py-3.5 text-[11px]" />
-            </div>
-            <div class="grid grid-cols-[1fr_auto] gap-2">
-              <button onclick="handleVerifyLink()" class="btn btn-primary py-3.5 text-[11px] font-bold text-white">
-                Verifikasi Link (/api/amp/reqprem)
-              </button>
-              <button onclick="resetAmFlow()" class="btn btn-ghost px-3.5 text-[#bae6fd]">
-                <i class="fa-solid fa-rotate-left"></i>
-              </button>
-            </div>
-          </div>
+        // ========== DOM REFS ==========
+        const emailInput = document.getElementById('emailInput');
+        const magicInput = document.getElementById('magicInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const activateBtn = document.getElementById('activateBtn');
+        const btnDefault = document.getElementById('btnDefault');
+        const loaderContainer = document.getElementById('loaderContainer');
+        const btnSuccess = document.getElementById('btnSuccess');
+        const errorMsg = document.getElementById('errorMsg');
 
-          <!-- STEP 3: SUCCESS RESULT -->
-          <div id="stepSuccessBox" class="hidden space-y-3.5 text-center py-2">
-            <div class="w-14 h-14 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-xl mb-2 shadow-[0_0_20px_rgba(52,211,153,0.35)]">
-              <i class="fa-solid fa-check"></i>
-            </div>
-            <h3 class="font-bold text-white text-[14px]">Akun Pro Berhasil Diaktifkan!</h3>
-            <div class="result-box p-3.5 rounded-[14px] text-left">
-              <div class="text-[9px] text-[#94a3b8]">Detail Respons Server</div>
-              <pre id="jsonResult" class="font-mono text-[10px] text-cyan-300 mt-1.5 overflow-x-auto whitespace-pre-wrap"></pre>
-            </div>
-            <button onclick="resetAmFlow()" class="btn btn-ghost w-full py-3 text-[10px]">Buat Lagi</button>
-          </div>
+        // ========== STATE ==========
+        let isLoading = false;
+        let isSuccess = false;
+        let cachedEmail = '';
 
-        </div>
-      </div>
-    </main>
+        // ========== UTILITY ==========
+        function showError(text) {
+            errorMsg.textContent = text;
+            errorMsg.classList.add('show');
+        }
 
-    <!-- FOOTER -->
-    <footer class="text-center pb-2 pt-1">
-      <div class="text-[9px] text-[#64748b]">
-        ThanzAM <span class="mx-1 text-[#38bdf8]/55">•</span> All systems ONLINE <span class="mx-1 text-[#38bdf8]/55">•</span> 2026
-      </div>
-    </footer>
-  </div>
+        function hideError() {
+            errorMsg.classList.remove('show');
+            errorMsg.textContent = '';
+        }
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="toast fixed z-50 bottom-5 left-1/2 liquid-glass rounded-[14px] px-4 py-3 text-[10px] text-white shadow-2xl max-w-[calc(100vw-32px)]"></div>
+        // ========== API CALLS ==========
+        async function callSend(email) {
+            const url = `${API_BASE}/api/am?action=send&apikey=${API_KEY}&email=${encodeURIComponent(email)}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        }
 
-  <!-- MODULAR API SCRIPT -->
-  <script type="module">
-    import { sendLinkApi } from './api/sendlink.js';
-    import { verifyReqPrem } from './api/reqprem.js';
+        async function callVerif(email, magicLink) {
+            const url = `${API_BASE}/api/am?action=verif&apikey=${API_KEY}&email=${encodeURIComponent(email)}&url=${encodeURIComponent(magicLink)}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        }
 
-    let savedEmail = "";
+        // ========== HANDLE SEND ==========
+        async function handleSend() {
+            const email = emailInput.value.trim();
+            hideError();
 
-    window.showToast = function(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
+            if (!email) {
+                showError('Masukkan email untuk dikirim.');
+                return;
+            }
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Masukkan email yang valid.');
+                return;
+            }
 
-    window.handleSendMagicLink = async function() {
-      const email = document.getElementById('inputEmail').value.trim();
-      if (!email || !email.includes('@')) {
-        showToast("⚠️ Masukkan email yang valid!");
-        return;
-      }
-      
-      savedEmail = email;
-      showToast("⏳ Mengirim magic link...");
+            const oldText = sendBtn.textContent;
+            sendBtn.textContent = 'Mengirim...';
+            sendBtn.disabled = true;
 
-      try {
-        const res = await sendLinkApi(email);
-        showToast("✅ " + res.message);
-        document.getElementById('stepEmailBox').classList.add('hidden');
-        document.getElementById('stepVerifyBox').classList.remove('hidden');
-        document.getElementById('flowInstruction').innerText = `Magic link terkirim ke ${email}. Masukkan link verifikasi di bawah.`;
-      } catch (err) {
-        showToast("❌ " + err.message);
-      }
-    };
+            try {
+                const data = await callSend(email);
+                if (data.status) {
+                    cachedEmail = email;
+                    sendBtn.textContent = '✓ Terkirim';
+                    magicInput.focus();
+                    setTimeout(() => {
+                        sendBtn.textContent = oldText;
+                        sendBtn.disabled = false;
+                    }, 1500);
+                } else {
+                    showError(`Gagal kirim: ${data.error || data.message || 'Unknown error'}`);
+                    sendBtn.textContent = oldText;
+                    sendBtn.disabled = false;
+                }
+            } catch (err) {
+                showError(`Error: ${err.message}`);
+                sendBtn.textContent = oldText;
+                sendBtn.disabled = false;
+            }
+        }
 
-    window.handleVerifyLink = async function() {
-      const link = document.getElementById('inputLink').value.trim();
-      if (!link) {
-        showToast("⚠️ Masukkan tautan verifikasi!");
-        return;
-      }
+        // ========== HANDLE ACTIVATION ==========
+        async function handleActivation() {
+            if (isLoading || isSuccess) return;
 
-      showToast("⏳ Memproses verifikasi akun...");
+            const email = emailInput.value.trim();
+            const magic = magicInput.value.trim();
 
-      try {
-        const res = await verifyReqPrem(savedEmail, link);
-        showToast("🎉 Berhasil diverifikasi!");
-        document.getElementById('stepVerifyBox').classList.add('hidden');
-        document.getElementById('stepSuccessBox').classList.remove('hidden');
-        document.getElementById('jsonResult').innerText = JSON.stringify(res, null, 2);
-        document.getElementById('flowInstruction').innerText = "Akun Alight Motion Pro berhasil diaktifkan.";
-      } catch (err) {
-        showToast("❌ " + err.message);
-      }
-    };
+            hideError();
 
-    window.resetAmFlow = function() {
-      document.getElementById('inputEmail').value = "";
-      document.getElementById('inputLink').value = "";
-      document.getElementById('stepSuccessBox').classList.add('hidden');
-      document.getElementById('stepVerifyBox').classList.add('hidden');
-      document.getElementById('stepEmailBox').classList.remove('hidden');
-      document.getElementById('flowInstruction').innerText = "Isi email aktif, kirim magic link, lalu verifikasi untuk mendapatkan akun Pro.";
-    };
-  </script>
+            if (!email) {
+                showError('Email wajib diisi.');
+                return;
+            }
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('Masukkan email yang valid.');
+                return;
+            }
+            if (!magic) {
+                showError('Magic Link wajib diisi.');
+                return;
+            }
+            if (!magic.startsWith('http://') && !magic.startsWith('https://')) {
+                showError('Magic Link harus berupa URL (http/https).');
+                return;
+            }
+
+            const emailToUse = cachedEmail || email;
+
+            isLoading = true;
+            activateBtn.disabled = true;
+            btnDefault.classList.add('hidden');
+            loaderContainer.classList.remove('hidden');
+
+            try {
+                const data = await callVerif(emailToUse, magic);
+                if (data.status) {
+                    isLoading = false;
+                    isSuccess = true;
+                    loaderContainer.classList.add('hidden');
+                    btnSuccess.classList.remove('hidden');
+                    cachedEmail = '';
+                } else {
+                    isLoading = false;
+                    activateBtn.disabled = false;
+                    loaderContainer.classList.add('hidden');
+                    btnDefault.classList.remove('hidden');
+                    showError(`Gagal: ${data.error || data.message || 'Unknown error'}`);
+                }
+            } catch (err) {
+                isLoading = false;
+                activateBtn.disabled = false;
+                loaderContainer.classList.add('hidden');
+                btnDefault.classList.remove('hidden');
+                showError(`Error: ${err.message}`);
+            }
+        }
+
+        // ========== EVENT LISTENERS ==========
+        sendBtn.addEventListener('click', handleSend);
+        activateBtn.addEventListener('click', handleActivation);
+
+        magicInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleActivation();
+            }
+        });
+
+        emailInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                magicInput.focus();
+            }
+        });
+
+        emailInput.addEventListener('input', hideError);
+        magicInput.addEventListener('input', hideError);
+
+        emailInput.focus();
+    })();
+</script>
+
 </body>
 </html>
