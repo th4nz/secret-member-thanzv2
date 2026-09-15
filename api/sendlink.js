@@ -1,4 +1,4 @@
-const GLOBAL_API_KEY = "ISAAW-PRW70Z4Z";
+const GLOBAL_API_KEY = "ISAAW-matchalatte";
 
 /**
  * Endpoint: /api/am/sendlink
